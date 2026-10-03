@@ -12,9 +12,13 @@
       <p>按厂区查看池位状态；点选瓦片在右侧登记峰值并改状态。</p>
     </div>
     <div class="legend">
-      <span class="leg-item filling">注水中</span>
-      <span class="leg-item slaking">熟化中</span>
-      <span class="leg-item drawn">已出灰</span>
+      {% for status, label in status_labels.items() %}
+      {% set present_in_plant = ponds | selectattr('status', 'equalto', status) | list | length > 0 %}
+      <span
+        class="leg-item {{ status }}{% if present_in_plant and not preference.is_visible(status) %} is-off{% endif %}"
+        title="{% if not preference.is_visible(status) %}该类瓦片已在图例偏好中隐藏{% else %}{{ label }}{% endif %}"
+      >{{ label }}</span>
+      {% endfor %}
     </div>
   </header>
 
@@ -57,7 +61,11 @@
       <span class="tile-cap">{{ '%.0f'|format(pond.capacity_m3) }} m³</span>
     </a>
     {% else %}
+    {% if ponds %}
+    <p class="empty-board">当前厂区的池位均被图例偏好隐藏，可到「图例偏好」调整勾选。</p>
+    {% else %}
     <p class="empty-board">当前厂区暂无熟化池</p>
+    {% endif %}
     {% endfor %}
   </div>
 

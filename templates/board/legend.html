@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}图例偏好{% endblock %}
+{% block content %}
+<section class="legend-page">
+  <header class="page-head">
+    <div>
+      <h1>图例偏好</h1>
+      <p>勾选希望出现在平面图网格中的池位状态；保存后对所有厂区的平面图立即生效。</p>
+    </div>
+    <a class="btn ghost" href="{{ url_for('board.floor_plan') }}">返回平面图</a>
+  </header>
+
+  <div class="panel legend-panel">
+    {% if not is_admin %}
+    <p class="hint legend-readonly">当前为操作工账号，仅可查看，不能修改图例偏好。</p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('board.legend_preference') }}" class="legend-form">
+      {% for status, label in status_labels.items() %}
+      <label class="legend-check status-{{ status }}">
+        <input
+          type="checkbox"
+          name="{{ status }}"
+          value="on"
+          {% if preference.is_visible(status) %}checked{% endif %}
+          {% if not is_admin %}disabled{% endif %}
+        />
+        <span class="leg-item {{ status }}">{{ label }}</span>
+        <span class="legend-check-hint">
+          {% if preference.is_visible(status) %}网格中显示{% else %}网格中隐藏{% endif %}
+        </span>
+      </label>
+      {% endfor %}
+
+      {% if is_admin %}
+      <div class="actions">
+        <button type="submit">保存偏好</button>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -52,7 +52,7 @@ def create_app() -> Flask:
 def seed_demo_data() -> None:
     from datetime import timedelta
 
-    from app.models import Plant, Pond, SlakeBatch, User, utcnow
+    from app.models import Plant, Pond, SlakeBatch, User, utcnow, LegendPreference
 
     if not User.query.filter_by(username="admin").first():
         admin = User(username="admin", role="admin")
@@ -71,6 +71,18 @@ def seed_demo_data() -> None:
         worker = User.query.filter_by(username="worker").first()
         worker.set_password("123456")
         worker.role = "worker"
+
+    # 图例偏好单例：仅在缺失时以“三类全显”的种子默认建一行，
+    # 已存在的保存偏好绝不重置（重启 / 重新 seed 后仍是管理员保存的那套）。
+    if not db.session.get(LegendPreference, LegendPreference.SINGLETON_ID):
+        db.session.add(
+            LegendPreference(
+                id=LegendPreference.SINGLETON_ID,
+                show_filling=True,
+                show_slaking=True,
+                show_drawn=True,
+            )
+        )
 
     if Plant.query.first():
         db.session.commit()

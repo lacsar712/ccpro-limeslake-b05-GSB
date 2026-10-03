@@ -75,3 +75,30 @@ class SlakeBatch(db.Model):
     notes = db.Column(db.Text, nullable=False, default="")
 
     pond = db.relationship("Pond", back_populates="batches")
+
+
+class LegendPreference(db.Model):
+    """图例偏好（全局单例，id 恒为 1）：控制三类状态瓦片在平面图上的显隐。"""
+
+    __tablename__ = "legend_preferences"
+
+    SINGLETON_ID = 1
+
+    id = db.Column(db.Integer, primary_key=True)
+    show_filling = db.Column(db.Boolean, nullable=False, default=True)
+    show_slaking = db.Column(db.Boolean, nullable=False, default=True)
+    show_drawn = db.Column(db.Boolean, nullable=False, default=True)
+    updated_at = db.Column(db.DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+    updated_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+
+    STATUS_FIELDS = {
+        Pond.STATUS_FILLING: "show_filling",
+        Pond.STATUS_SLAKING: "show_slaking",
+        Pond.STATUS_DRAWN: "show_drawn",
+    }
+
+    def is_visible(self, status: str) -> bool:
+        return bool(getattr(self, self.STATUS_FIELDS[status]))
+
+    def as_dict(self) -> dict[str, bool]:
+        return {status: self.is_visible(status) for status in self.STATUS_FIELDS}

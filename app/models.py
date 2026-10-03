@@ -64,6 +64,34 @@ class Pond(db.Model):
     )
 
 
+class LegendPreference(db.Model):
+    """图例（瓦片分类）显隐偏好。
+
+    全系统单行：id 由 CHECK 约束固定为 1，保证并发保存也只会有一版。
+    只影响平面图瓦片的显隐，绝不写入任何 Pond 状态。
+    """
+
+    __tablename__ = "legend_preferences"
+    __table_args__ = (
+        db.CheckConstraint("id = 1", name="ck_legend_preferences_singleton"),
+    )
+
+    SINGLETON_ID = 1
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+    show_filling = db.Column(db.Boolean, nullable=False, default=True)
+    show_slaking = db.Column(db.Boolean, nullable=False, default=True)
+    show_drawn = db.Column(db.Boolean, nullable=False, default=True)
+    updated_at = db.Column(db.DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+    def as_visibility(self) -> dict:
+        return {
+            Pond.STATUS_FILLING: bool(self.show_filling),
+            Pond.STATUS_SLAKING: bool(self.show_slaking),
+            Pond.STATUS_DRAWN: bool(self.show_drawn),
+        }
+
+
 class SlakeBatch(db.Model):
     __tablename__ = "slake_batches"
 

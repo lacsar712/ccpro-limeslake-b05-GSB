@@ -126,6 +126,72 @@ body {
 .leg-item.slaking { background: var(--slake-bg); color: var(--slake-ink); }
 .leg-item.drawn { background: var(--drawn-bg); color: var(--drawn-ink); }
 
+.leg-item.is-off {
+  opacity: 0.42;
+  text-decoration: line-through;
+  position: relative;
+}
+
+.legend-settings-link {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--slate);
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.legend-settings-link:hover { border-color: var(--lime-mid); color: var(--lime-mid); }
+
+.legend-page { max-width: 720px; }
+
+.legend-panel {
+  max-width: none;
+  gap: 18px;
+}
+
+.legend-readonly-note {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.legend-form {
+  display: grid;
+  gap: 14px;
+}
+
+.legend-check {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.legend-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--lime-mid);
+}
+
+.legend-check input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}
+
+.legend-check-hint {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
 .plant-chips {
   display: flex;
   flex-wrap: wrap;

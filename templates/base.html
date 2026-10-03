@@ -20,6 +20,7 @@
       </div>
       <nav class="top-nav">
         <a href="{{ url_for('board.floor_plan') }}" class="{% if request.blueprint == 'board' %}active{% endif %}">平面图</a>
+        <a href="{{ url_for('legend.preferences') }}" class="{% if request.blueprint == 'legend' %}active{% endif %}">图例偏好</a>
         <a href="{{ url_for('auth.logout') }}">退出</a>
       </nav>
     </header>

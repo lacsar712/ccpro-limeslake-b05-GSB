@@ -3,6 +3,7 @@ from flask_login import login_required
 
 from app.extensions import db
 from app.models import Plant, Pond
+from app.services.legend import STATUS_KEYS, get_visibility
 from app.services.rules import RuleError, assert_can_set_pond_status, latest_batch_for_pond
 
 bp = Blueprint("board", __name__, url_prefix="/board")
@@ -33,16 +34,27 @@ def floor_plan():
             .all()
         )
 
+    visibility = get_visibility()
+
+    all_cards = []
     pond_cards = []
     for pond in ponds:
         batch = latest_batch_for_pond(pond)
-        pond_cards.append({"pond": pond, "batch": batch})
+        card = {"pond": pond, "batch": batch}
+        all_cards.append(card)
+        # 只在网格中隐藏瓦片；偏好不改动池本身的任何状态
+        if visibility.get(pond.status, True):
+            pond_cards.append(card)
+
+    hidden_statuses = [
+        STATUS_LABELS[key] for key in STATUS_KEYS if not visibility.get(key, True)
+    ]
 
     selected_id = request.args.get("pond", type=int)
     selected = None
     selected_batch = None
     if selected_id:
-        selected = next((c["pond"] for c in pond_cards if c["pond"].id == selected_id), None)
+        selected = next((c["pond"] for c in all_cards if c["pond"].id == selected_id), None)
         if selected:
             selected_batch = latest_batch_for_pond(selected)
 
@@ -51,6 +63,9 @@ def floor_plan():
         plants=plants,
         active_plant=active_plant,
         pond_cards=pond_cards,
+        hidden_total=len(all_cards) - len(pond_cards),
+        hidden_statuses=hidden_statuses,
+        visibility=visibility,
         selected=selected,
         selected_batch=selected_batch,
         status_labels=STATUS_LABELS,

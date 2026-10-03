@@ -12,9 +12,10 @@
       <p>按厂区查看池位状态；点选瓦片在右侧登记峰值并改状态。</p>
     </div>
     <div class="legend">
-      <span class="leg-item filling">注水中</span>
-      <span class="leg-item slaking">熟化中</span>
-      <span class="leg-item drawn">已出灰</span>
+      <span class="leg-item filling {% if not visibility['filling'] %}is-off{% endif %}">注水中{% if not visibility['filling'] %} · 已隐藏{% endif %}</span>
+      <span class="leg-item slaking {% if not visibility['slaking'] %}is-off{% endif %}">熟化中{% if not visibility['slaking'] %} · 已隐藏{% endif %}</span>
+      <span class="leg-item drawn {% if not visibility['drawn'] %}is-off{% endif %}">已出灰{% if not visibility['drawn'] %} · 已隐藏{% endif %}</span>
+      <a class="legend-settings-link" href="{{ url_for('legend.preferences') }}">图例偏好设置</a>
     </div>
   </header>
 
@@ -30,7 +31,11 @@
   {% endif %}
 
   {% if active_plant %}
-  <p class="plant-meta">{{ active_plant.location or '厂区位置未填' }} · {{ pond_cards|length }} 个池位</p>
+  <p class="plant-meta">{{ active_plant.location or '厂区位置未填' }} · {{ pond_cards|length }} 个池位{% if hidden_total %}（另有 {{ hidden_total }} 个瓦片按图例偏好隐藏：{{ hidden_statuses|join('、') }}）{% endif %}</p>
+  {% endif %}
+
+  {% if hidden_total and not pond_cards %}
+  <p class="empty-board">当前厂区的池位瓦片均按图例偏好隐藏，可在<a href="{{ url_for('legend.preferences') }}">图例偏好</a>中调整。</p>
   {% endif %}
 
   <div class="pond-grid" role="list">
